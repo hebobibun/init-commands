@@ -14,6 +14,19 @@ NC="\033[0m"
 read -p "Enter your Laravel project name: " PROJECT_NAME
 DB_NAME="${PROJECT_NAME}_db"
 
+# Prompt for database connection details
+echo -e "${GREEN}Please enter your MySQL database connection details:${NC}"
+read -p "DB_HOST [127.0.0.1]: " DB_HOST
+read -p "DB_PORT [3306]: " DB_PORT
+read -p "DB_USERNAME [root]: " DB_USERNAME
+read -p "DB_PASSWORD [123]: " DB_PASSWORD
+
+# Set defaults if the user doesn't input anything
+DB_HOST="${DB_HOST:-127.0.0.1}"
+DB_PORT="${DB_PORT:-3306}"
+DB_USERNAME="${DB_USERNAME:-root}"
+DB_PASSWORD="${DB_PASSWORD:-123}"
+
 # Check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -67,11 +80,11 @@ fi
 
 # Update database configuration in .env
 sed -i "s/^DB_CONNECTION=.*/DB_CONNECTION=mysql/" .env
-sed -i "s/^# DB_HOST=.*/DB_HOST=127.0.0.1/" .env
-sed -i "s/^# DB_PORT=.*/DB_PORT=3306/" .env
+sed -i "s/^# DB_HOST=.*/DB_HOST=${DB_HOST}/" .env
+sed -i "s/^# DB_PORT=.*/DB_PORT=${DB_PORT}/" .env
 sed -i "s/^# DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" .env
-sed -i "s/^# DB_USERNAME=.*/DB_USERNAME=root/" .env
-sed -i "s/^# DB_PASSWORD=.*/DB_PASSWORD=123/" .env
+sed -i "s/^# DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/" .env
+sed -i "s/^# DB_PASSWORD=.*/DB_PASSWORD=${DB_PASSWORD}/" .env
 
 # Generate application key
 echo -e "${GREEN}Generating application key...${NC}"
@@ -79,7 +92,7 @@ php artisan key:generate --ansi
 
 # Create database
 echo -e "${GREEN}Creating MySQL database '${DB_NAME}' if it doesn't exist...${NC}"
-mysql -u root -p -h 127.0.0.1 -P 3306 -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+mysql -u "$DB_USERNAME" -p"$DB_PASSWORD" -h "$DB_HOST" -P "$DB_PORT" -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
 
 # Run migrations
 echo -e "${GREEN}Running database migrations...${NC}"
