@@ -13,7 +13,13 @@ Installs a specified version of Go programming language.
 ./install_go.sh <version> # e.g., ./install_go.sh 1.22.7
 ```
 
-it will remove any existing Go installation and install the specified version.
+- It will check if the requested version is already cached in `/opt/go-versions`.
+
+- If not, it will download the tarball and extract it to the cache directory.
+
+- Then it will create a symbolic link to the cache directory.
+
+- Finally, it will update the PATH and environment variables in `.bashrc`.
 
 ### 2. `install_laravel.sh`
 Installs Dependencies, and creates a new Laravel project.
